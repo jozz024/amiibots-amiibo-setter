@@ -1,2 +1,2 @@
-# amiibots-amiibo-setter
+# pingmii
  SoonTM
