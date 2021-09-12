@@ -6,7 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.environ['BOT-TOKEN']
-AMIIBOID = os.environ['AMIIBO-ID']
+DISABLEAMIIBOID = os.environ['DISABLE-AMIIBO-ID']
+ENABLEAMIIBOID = os.environ['ENABLE-AMIIBO-ID']
 APIKEY = os.environ['AMIIBOTS-API-KEY']
 USERID = os.environ['USERID']
 USER = os.environ['USERNAME']
@@ -19,7 +20,7 @@ class MyClient(discord.Client):
         activity = discord.Game(
             name=f'Pinging {USER} when their amiibo finish their amiibots run!')
         await client.change_presence(status=discord.Status.idle, activity=activity)
-    url = f'https://www.amiibots.com/api/amiibo/{AMIIBOID}'
+    url = f'https://www.amiibots.com/api/amiibo/{DISABLEAMIIBOID}'
     headers = {'Authorization': APIKEY}
     amiibodata = requests.get(url, headers=headers)
     match_turn_off_numbers = [29, 49, 99, 149]
@@ -29,14 +30,16 @@ class MyClient(discord.Client):
             return
         if USERID in message.content and message.channel.id == SHOUTBOXID:
             if MyClient.amiibo['total_matches'] in MyClient.match_turn_off_numbers:
-                url = f'https://www.amiibots.com/api/amiibo/{AMIIBOID}'
+                disableurl = f'https://www.amiibots.com/api/amiibo/{DISABLEAMIIBOID}'
                 headers = {'Authorization': APIKEY}
-                payload = {'is_active': False}
-                response = requests.put(url, headers=headers, json = payload)
+                disablepayload = {'is_active': False}
+                disableamiibo = requests.put(disableurl, headers=headers, json = disablepayload)
                 message_send_channel = client.get_channel(PINGCHANNEL)
                 await message_send_channel.send(
-                    f"<@{USERID}> Your amiibo, {MyClient.amiibo['name']}, finished its run with {MyClient.amiibo['total_matches'] + 1} matches!"
-                )
+                    f"<@{USERID}> Your amiibo, {MyClient.amiibo['name']}, finished its run with {MyClient.amiibo['total_matches'] + 1} matches!")
+                enableurl = f'https://www.amiibots.com/api/amiibo/{ENABLEAMIIBOID}'
+                enablepayload = {'is_active': True}
+                enableamiibo = requests.put(enableurl, headers=headers, json = enablepayload)
 
 client = MyClient()
 client.run(TOKEN)
