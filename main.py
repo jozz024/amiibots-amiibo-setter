@@ -28,7 +28,7 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         if message.author == client.user:
             return
-        if USERID in message.content and message.channel.id == SHOUTBOXID:
+        if (USERID or USER) in message.content and message.channel.id == SHOUTBOXID:
             if MyClient.amiibo['total_matches'] in MyClient.match_turn_off_numbers:
                 disableurl = f'https://www.amiibots.com/api/amiibo/{DISABLEAMIIBOID}'
                 headers = {'Authorization': APIKEY}
