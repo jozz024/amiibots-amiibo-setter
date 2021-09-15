@@ -7,7 +7,7 @@ load_dotenv()
 
 TOKEN = os.environ['BOT-TOKEN']
 DISABLEAMIIBOID = os.environ['DISABLE-AMIIBO-ID']
-ENABLEAMIIBOID = os.environ['ENABLE-AMIIBO-ID']
+ENABLEAMIIBOID = os.environ.get('ENABLE-AMIIBO-ID', None)
 APIKEY = os.environ['AMIIBOTS-API-KEY']
 USERID = os.environ['USERID']
 USER = os.environ['TWITCH-USERNAME']
