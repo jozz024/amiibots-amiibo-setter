@@ -9,10 +9,10 @@ TOKEN = os.environ['BOT-TOKEN']
 DISABLEAMIIBOID = os.environ['DISABLE-AMIIBO-ID']
 ENABLEAMIIBOID = os.environ.get('ENABLE-AMIIBO-ID', None)
 APIKEY = os.environ['AMIIBOTS-API-KEY']
-USERID = os.environ['USERID']
+USERID = os.environ['USER-ID']
 USER = os.environ['TWITCH-USERNAME']
-PINGCHANNEL = int(os.environ['PINGCHANNEL'])
-SHOUTBOXID = int(os.environ['SHOUTBOXID'])
+PINGCHANNEL = int(os.environ['PING-CHANNEL-ID'])
+SHOUTBOXID = int(os.environ['SHOUTBOX-ID'])
 
 BASE_URL = 'https://www.amiibots.com/api/amiibo/'
 OLD_AMIIBO_URL = BASE_URL+DISABLEAMIIBOID
