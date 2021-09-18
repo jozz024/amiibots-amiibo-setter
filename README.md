@@ -1,4 +1,7 @@
 ### pingmii
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 ![logo](https://cdn.discordapp.com/attachments/881840554340679720/886729364329336832/pingmii_icon_png.png)
 
 pingmii is a Discord Bot for detecting when an amiibots amiibo is at a specified amount of games and disabling it.
