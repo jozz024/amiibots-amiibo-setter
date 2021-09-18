@@ -13,7 +13,7 @@ USERID = os.environ['USER-ID']
 USER = os.environ['TWITCH-USERNAME']
 PINGCHANNEL = int(os.environ['PING-CHANNEL-ID'])
 SHOUTBOXID = int(os.environ['SHOUTBOX-ID'])
-RATINGORMATCHES = os.environ.get('RATING-OR-MATCHES', None)
+RATING_OR_MATCHES = os.environ.get('RATING-OR-MATCHES', None)
 
 BASE_URL = 'https://www.amiibots.com/api/amiibo/'
 OLD_AMIIBO_URL = BASE_URL+DISABLEAMIIBOID
@@ -34,7 +34,7 @@ class MyClient(discord.Client):
     async def on_message(self, message):
         if message.author == client.user:
             return
-        if (USERID in message.content or USER in message.content) and amiiboname in message.content and message.channel.id == SHOUTBOXID and (RATING-OR-MATCHES = 'Matches' or None):
+        if (USERID in message.content or USER in message.content) and amiiboname in message.content and message.channel.id == SHOUTBOXID and (RATING_OR_MATCHES = 'Matches' or None):
             amiibo_data = requests.get(OLD_AMIIBO_URL, headers=HEADERS)
             amiibo = amiibo_data.json()['data']
             if amiibo['total_matches'] + 1 in MATCH_TURN_OFF_NUMBERS:
@@ -45,7 +45,7 @@ class MyClient(discord.Client):
                 if ENABLEAMIIBOID is not None:
                     enablepayload = {'is_active': True}
                     enableamiibo = requests.put(NEW_AMIIBO_URL, headers=HEADERS, json=enablepayload)
-            if ENABLEAMIIBOID is not None and RATING-OR-MATCHES = 'Rating':
+            if ENABLEAMIIBOID is not None and RATING_OR_MATCHES = 'Rating':
                 newamiibo = requests.get(NEW_AMIIBO_URL, headers=HEADERS)
                 oldamiibo = requests.get(OLD_AMIIBO_URL, headers=HEADERS)
                 if oldamiibo.json()['data']['rating'] <= newamiibo.json()['data']['rating']:
