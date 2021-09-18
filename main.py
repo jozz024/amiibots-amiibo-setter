@@ -58,7 +58,7 @@ class MyClient(discord.Client):
                    disablepayload = {'is_active': False}
                    enablepayload = {'is_active': True}
                    disablenewamiibo =  requests.put(NEW_AMIIBO_URL, headers=HEADERS, json=disablepayload)
-                   enableoldamiibo = requests.put(OLF_AMIIBO_URL, headers=HEADERS, json=enablepayload)
+                   enableoldamiibo = requests.put(OLD_AMIIBO_URL, headers=HEADERS, json=enablepayload)
                    message_send_channel.send(f"<@{USERID}> your amiibo have swithed due to rating changes")
                    
 client = MyClient()
