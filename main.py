@@ -77,7 +77,7 @@ async def getcurrentamiibostats(ctx):
     amiibo_win_percent = float(amiibo["win_percentage"]) * 100
     id_to_char = {value: key for (key, value) in CHARACTER_NAME_TO_ID_MAPPING.items()}
     await ctx.send(
-        f'Name: {amiibo["name"]} \nCharacter: {str(id_to_char[amiibo["playable_character_id"]]).title()}\nRating: {round(amiibo["rating"], 2)} \nWin Rate: {amiibo_win_percent}% \nWins: {amiibo["wins"]} \nLosses: {amiibo["losses"]} \nTotal Matches: {amiibo["total_matches"]}'
+        f'Name: {amiibo["name"]} \nCharacter: {str(id_to_char[amiibo["playable_character_id"]]).title()}\nRating: {round(amiibo["rating"], 2)} \nWin Rate: {amiibo_win_percent}% \nWins: {int(amiibo["wins"])} \nLosses: {int(amiibo["losses"])} \nTotal Matches: {int(amiibo["total_matches"])}'
     )
 
 
