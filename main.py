@@ -1,42 +1,19 @@
-import os
 import requests
-import discord
-from dotenv import load_dotenv
+import asyncio
+from config import *
 
-load_dotenv()
+@bot.event
+async def on_ready():
+    print(f"Logged on as {bot.user} and monitoring {amiiboname}'s matches, with {amiiboname_2} coming up next!")
+    await bot.change_presence(
+        status=nextcord.Status.idle,
+        activity=nextcord.Activity(name=f"Pinging {USER} when their amiibo finish their amiibots run!", type=nextcord.ActivityType.playing),
+    )
 
-TOKEN = os.environ["BOT-TOKEN"]
-DISABLEAMIIBOID = os.environ["DISABLE-AMIIBO-ID"]
-ENABLEAMIIBOID = os.environ.get("ENABLE-AMIIBO-ID", None)
-APIKEY = os.environ["AMIIBOTS-API-KEY"]
-USERID = os.environ["USER-ID"]
-USER = os.environ["TWITCH-USERNAME"]
-PINGCHANNEL = int(os.environ["PING-CHANNEL-ID"])
-SHOUTBOXID = int(os.environ["SHOUTBOX-ID"])
-RATING_OR_MATCHES = os.environ.get("RATING-OR-MATCHES", None)
-
-BASE_URL = "https://www.amiibots.com/api/amiibo/"
-OLD_AMIIBO_URL = BASE_URL + DISABLEAMIIBOID
-NEW_AMIIBO_URL = BASE_URL + ENABLEAMIIBOID
-if "Bearer" in APIKEY:
-    HEADERS = {"Authorization": APIKEY}
-else:
-    HEADERS = {"Authorization": f"Bearer {APIKEY}"}
-MATCH_TURN_OFF_NUMBERS = [30, 50, 100, 150]
-amiibo_data_name = requests.get(OLD_AMIIBO_URL, headers=HEADERS)
-amiiboname = amiibo_data_name.json()["data"]["name"]
-
-
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print(f"Logged on as {self.user}!")
-        activity = discord.Game(
-            name=f"Pinging {USER} when their amiibo finish their amiibots run!"
-        )
-        await client.change_presence(status=discord.Status.idle, activity=activity)
-
-    async def on_message(self, message):
-        if message.author == client.user:
+@bot.listen("on_message")
+async def pingmii(message):
+        message_send_channel = bot.get_channel(PINGCHANNEL)
+        if message.author == bot.user:
             return
         if (
             (USERID in message.content or USER in message.content)
@@ -44,14 +21,12 @@ class MyClient(discord.Client):
             and message.channel.id == SHOUTBOXID
             and (RATING_OR_MATCHES == "Matches" or None)
         ):
-            amiibo_data = requests.get(OLD_AMIIBO_URL, headers=HEADERS)
-            amiibo = amiibo_data.json()["data"]
+            amiibo = requests.get(OLD_AMIIBO_URL, headers=HEADERS).json()["data"]
             if amiibo["total_matches"] + 1 in MATCH_TURN_OFF_NUMBERS:
                 disablepayload = {"is_active": False}
                 disabled_amiibo = requests.put(
                     OLD_AMIIBO_URL, headers=HEADERS, json=disablepayload
                 )
-                message_send_channel = client.get_channel(PINGCHANNEL)
                 await message_send_channel.send(
                     f"<@{USERID}> Your amiibo, {amiibo['name']}, finished its run with {amiibo['total_matches'] + 1} matches!"
                 )
@@ -61,11 +36,11 @@ class MyClient(discord.Client):
                         NEW_AMIIBO_URL, headers=HEADERS, json=enablepayload
                     )
             if ENABLEAMIIBOID is not None and RATING_OR_MATCHES == "Rating":
-                newamiibo = requests.get(NEW_AMIIBO_URL, headers=HEADERS)
-                oldamiibo = requests.get(OLD_AMIIBO_URL, headers=HEADERS)
+                newamiibo = requests.get(NEW_AMIIBO_URL, headers=HEADERS).json()["data"]
+                oldamiibo = requests.get(OLD_AMIIBO_URL, headers=HEADERS).json()["data"]
                 if (
-                    oldamiibo.json()["data"]["rating"]
-                    <= newamiibo.json()["data"]["rating"]
+                    oldamiibo["rating"]
+                    <= newamiibo["rating"]
                 ):
                     disablepayload = {"is_active": False}
                     enablepayload = {"is_active": True}
@@ -75,12 +50,12 @@ class MyClient(discord.Client):
                     enablenewamiibo = requests.put(
                         NEW_AMIIBO_URL, headers=HEADERS, json=enablepayload
                     )
-                    message_send_channel.send(
+                    await message_send_channel.send(
                         f"<@{USERID}> your amiibo have swithed due to rating changes"
                     )
                 if (
-                    newamiibo.json()["data"]["rating"]
-                    <= oldamiibo.json()["data"]["rating"]
+                    newamiibo["rating"]
+                    <= oldamiibo["rating"]
                 ):
                     disablepayload = {"is_active": False}
                     enablepayload = {"is_active": True}
@@ -90,10 +65,18 @@ class MyClient(discord.Client):
                     enableoldamiibo = requests.put(
                         OLD_AMIIBO_URL, headers=HEADERS, json=enablepayload
                     )
-                    message_send_channel.send(
+                    await message_send_channel.send(
                         f"<@{USERID}> your amiibo have swithed due to rating changes"
                     )
+                    
+@bot.command(name='currentamiibostats')
+async def getcurrentamiibostats(ctx):
+    amiibo = requests.get(OLD_AMIIBO_URL, headers=HEADERS).json()["data"]
+    amiibo_win_percent = float(amiibo["win_percentage"]) * 100
+    id_to_char = {value : key for (key, value) in CHARACTER_NAME_TO_ID_MAPPING.items()}
+    await ctx.send(f'Name: {amiibo["name"]} \nCharacter: {str(id_to_char[amiibo["playable_character_id"]]).title()}\nRating: {round(amiibo["rating"], 2)} \nWin Rate: {amiibo_win_percent}% \nWins: {amiibo["wins"]} \nLosses: {amiibo["losses"]} \nTotal Matches: {amiibo["total_matches"]}')
 
-
-client = MyClient()
-client.run(TOKEN)
+loop = asyncio.get_event_loop()
+loop.run_until_complete(
+    bot.start(TOKEN)
+)
